@@ -3,7 +3,7 @@ Summary(pl.UTF-8):	Wiązania języka Ruby do libcdio
 Name:		ruby-rbcdio
 Version:	0.03
 Release:	1
-License:	GPL v2+
+License:	GPL v3+
 Group:		Development/Languages
 Source0:	http://ftp.gnu.org/gnu/libcdio/rbcdio-%{version}.tgz
 # Source0-md5:	6be0755bfb4a0b48fcb459b9f8fd78c3
