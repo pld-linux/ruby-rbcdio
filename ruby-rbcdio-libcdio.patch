@@ -1,0 +1,147 @@
+--- rbcdio-0.05/swig/cdtext.swg.orig	2018-10-27 17:31:20.345054852 +0200
++++ rbcdio-0.05/swig/cdtext.swg	2018-10-27 17:51:56.401707405 +0200
+@@ -19,25 +19,22 @@
+ 
+ /* See <cdio/cdtext.h> For more extensive documentation */
+ 
+-%constant long int CDTEXT_ARRANGER   = CDTEXT_ARRANGER;
+-%constant long int CDTEXT_COMPOSER   = CDTEXT_COMPOSER;
+-%constant long int CDTEXT_DISCID     = CDTEXT_DISCID;
+-%constant long int CDTEXT_GENRE      = CDTEXT_GENRE;
+-%constant long int CDTEXT_MESSAGE    = CDTEXT_MESSAGE;
+-%constant long int CDTEXT_ISRC       = CDTEXT_ISRC;
+-%constant long int CDTEXT_PERFORMER  = CDTEXT_PERFORMER;
+-%constant long int CDTEXT_SIZE_INFO  = CDTEXT_SIZE_INFO;
+-%constant long int CDTEXT_SONGWRITER = CDTEXT_SONGWRITER;
+-%constant long int CDTEXT_TITLE      = CDTEXT_TITLE;
+-%constant long int CDTEXT_TOC_INFO   = CDTEXT_TOC_INFO;
+-%constant long int CDTEXT_TOC_INFO2  = CDTEXT_TOC_INFO2;
+-%constant long int CDTEXT_UPC_EAN    = CDTEXT_UPC_EAN;
++%constant long int CDTEXT_FIELD_ARRANGER   = CDTEXT_FIELD_ARRANGER;
++%constant long int CDTEXT_FIELD_COMPOSER   = CDTEXT_FIELD_COMPOSER;
++%constant long int CDTEXT_FIELD_DISCID     = CDTEXT_FIELD_DISCID;
++%constant long int CDTEXT_FIELD_GENRE      = CDTEXT_FIELD_GENRE;
++%constant long int CDTEXT_FIELD_MESSAGE    = CDTEXT_FIELD_MESSAGE;
++%constant long int CDTEXT_FIELD_ISRC       = CDTEXT_FIELD_ISRC;
++%constant long int CDTEXT_FIELD_PERFORMER  = CDTEXT_FIELD_PERFORMER;
++%constant long int CDTEXT_FIELD_SONGWRITER = CDTEXT_FIELD_SONGWRITER;
++%constant long int CDTEXT_FIELD_TITLE      = CDTEXT_FIELD_TITLE;
++%constant long int CDTEXT_FIELD_UPC_EAN    = CDTEXT_FIELD_UPC_EAN;
++%constant long int CDTEXT_FIELD_INVALID    = CDTEXT_FIELD_INVALID;
+ 
+-%constant long int CDTEXT_INVALID    = CDTEXT_INVALID;
+ %constant long int MIN_CDTEXT_FIELD  = MIN_CDTEXT_FIELD;
+ %constant long int MAX_CDTEXT_FIELDS = MAX_CDTEXT_FIELDS;
+ 
+-typedef unsigned long int cdtext_field_t;
++typedef unsigned int cdtext_field_t;
+ 
+ %feature("autodoc",
+ "cdtext_field2str(key)->string
+@@ -46,22 +43,15 @@ Get the name of the key.");
+ const char *cdtext_field2str (cdtext_field_t key);
+ 
+ %feature("autodoc",
+-"cdtext_get(key, p_cdtext)->string
++"cdtext_get(p_cdtext, key, track)->string
+ Get the value associated with key.");
+ 
+-const char *cdtext_get (cdtext_field_t key, const cdtext_t *cdtext);
++char *cdtext_get (const cdtext_t *cdtext, cdtext_field_t key, track_t track);
+ 
+ %feature("autodoc",
+-"cdtext_is_keyword(string)->int
+-Returns enum value of keyword if the key is a CD-Text keyword,
+-returns MAX_CDTEXT_FIELDS otherwise.");
+-
+-cdtext_field_t cdtext_is_keyword (const char *key);
+-
+-%feature("autodoc",
+-"cdtext_set(key, string, p_cdtext)
++"cdtext_set(p_cdtext, key, value, track, charset)
+ Set the value associated with key.");
+ 
+-void cdtext_set (cdtext_field_t key, const char *value, cdtext_t *cdtext);
++void cdtext_set (cdtext_t *p_cdtext, cdtext_field_t key, const uint8_t *value, track_t track, const char *charset);
+ 
+ 
+--- rbcdio-0.05/swig/device_const.swg.orig	2018-10-27 17:31:20.345054852 +0200
++++ rbcdio-0.05/swig/device_const.swg	2018-10-27 17:39:15.885049421 +0200
+@@ -84,7 +84,6 @@
+ /* driver_id_t enums. */
+ %constant long int DRIVER_UNKNOWN = DRIVER_UNKNOWN;
+ %constant long int DRIVER_AIX = DRIVER_AIX;
+-%constant long int DRIVER_BSDI = DRIVER_BSDI;
+ %constant long int DRIVER_FREEBSD = DRIVER_FREEBSD;
+ %constant long int DRIVER_LINUX = DRIVER_LINUX;
+ %constant long int DRIVER_SOLARIS = DRIVER_SOLARIS;
+@@ -95,11 +94,6 @@
+ %constant long int DRIVER_NRG = DRIVER_NRG;
+ %constant long int DRIVER_DEVICE = DRIVER_DEVICE;
+ 
+-%constant long int MIN_DRIVER = CDIO_MIN_DRIVER;
+-%constant long int MIN_DEVICE_DRIVER = CDIO_MIN_DEVICE_DRIVER;
+-%constant long int MAX_DRIVER = CDIO_MAX_DRIVER;
+-%constant long int MAX_DEVICE_DRIVER = CDIO_MAX_DEVICE_DRIVER;
+-
+ 
+ %constant long int DRIVER_OP_SUCCESS = DRIVER_OP_SUCCESS;
+ %constant long int DRIVER_OP_ERROR = DRIVER_OP_ERROR;
+--- rbcdio-0.05/swig/device.swg.orig	2018-10-27 17:31:20.345054852 +0200
++++ rbcdio-0.05/swig/device.swg	2018-10-27 18:11:47.678360467 +0200
+@@ -321,8 +321,6 @@ if driver id is out of range.");
+ int
+ have_driver (unsigned int driver_id)
+ {
+-  if (driver_id < CDIO_MIN_DRIVER || driver_id > CDIO_MAX_DRIVER)
+-    return -1;
+   if (cdio_have_driver(driver_id)) return 1;
+   return 0;
+ }
+--- rbcdio-0.05/swig/rubyiso9660.swg.orig	2018-10-27 17:31:20.345054852 +0200
++++ rbcdio-0.05/swig/rubyiso9660.swg	2018-10-27 19:22:01.594979020 +0200
+@@ -131,7 +131,7 @@ typedef iso9660_stat_t IsoStat_t;
+ 	rb_ary_push(resultobj, stat);
+ 
+       }
+-      _cdio_list_free(result, 1);
++      _cdio_list_free(result, 1, iso9660_stat_free);
+       return resultobj;
+     }
+ }
+@@ -556,8 +556,7 @@ is removed and if level 1 ISO-9660 names
+ The b_mode2 parameter is not used.");
+ %rename iso9660_fs_stat_translate fs_stat_translate;
+ IsoStat_t *iso9660_fs_stat_translate (CdIo_t *p_cdio, 
+-				      const char psz_path[], 
+-				      bool b_mode2=false);
++				      const char psz_path[]);
+ 
+ %feature("autodoc",
+ "Return file status for pathname. None is returned on error.");
+@@ -581,7 +580,7 @@ IsoStatList_t *fs_readdir (CdIo_t *p_cdi
+ %inline %{
+ IsoStatList_t *fs_readdir (CdIo_t *p_cdio, const char psz_path[])
+ {
+-  CdioList_t *p_statlist = iso9660_fs_readdir (p_cdio, psz_path, false);
++  CdioList_t *p_statlist = iso9660_fs_readdir (p_cdio, psz_path);
+   return p_statlist;
+ }
+ %}
+--- rbcdio-0.05/swig/track.swg.orig	2018-10-27 17:31:20.345054852 +0200
++++ rbcdio-0.05/swig/track.swg	2018-10-27 18:13:20.125026080 +0200
+@@ -49,11 +49,10 @@ typedef int track_flag_t;
+ 
+ %rename cdio_get_cdtext get_cdtext;
+ %feature("autodoc",
+-"cdio_get_cdtext(track)->cdtext
+-    Get the CDText object for the given track number.
+-    Use track 0 for the disc's CDText object.");
++"cdio_get_cdtext(p_cdio)->cdtext
++    Get the CDText object for disc.");
+ 
+-cdtext_t *cdio_get_cdtext (CdIo_t *p_cdio, track_t i_track);
++cdtext_t *cdio_get_cdtext (CdIo_t *p_cdio);
+ 
+ %rename cdio_get_first_track_num get_first_track_num;
+ %feature("autodoc",
