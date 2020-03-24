@@ -2,7 +2,7 @@ Summary:	Ruby bindings for libcdio
 Summary(pl.UTF-8):	Wiązania języka Ruby do libcdio
 Name:		ruby-rbcdio
 Version:	0.05
-Release:	2
+Release:	3
 License:	GPL v3+
 Group:		Development/Languages
 #Source0:	http://ftp.gnu.org/gnu/libcdio/rbcdio-%{version}.tgz
@@ -30,6 +30,11 @@ Wiązania języka Ruby do libcdio.
 %prep
 %setup -q -n rbcdio-%{version}
 %patch0 -p1
+
+%{__sed} -E -i -e '1s,#!\s*/usr/bin/env\s+ruby(\s|$),#!%{__ruby}\1,' \
+      example/*.rb \
+      lib/cdio.rb \
+      lib/iso9660.rb
 
 # force regeneration
 %{__rm} ext/cdio/*_wrap.c ext/iso9660/*_wrap.c
