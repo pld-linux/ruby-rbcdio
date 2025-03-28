@@ -29,7 +29,7 @@ Wiązania języka Ruby do libcdio.
 
 %prep
 %setup -q -n rbcdio-%{version}
-%patch0 -p1
+%patch -P0 -p1
 
 %{__sed} -E -i -e '1s,#!\s*/usr/bin/env\s+ruby(\s|$),#!%{__ruby}\1,' \
       example/*.rb \
