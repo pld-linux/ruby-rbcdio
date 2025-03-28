@@ -105,7 +105,7 @@
  
        }
 -      _cdio_list_free(result, 1);
-+      _cdio_list_free(result, 1, iso9660_stat_free);
++      _cdio_list_free(result, 1, (CdioDataFree_t)iso9660_stat_free);
        return resultobj;
      }
  }
